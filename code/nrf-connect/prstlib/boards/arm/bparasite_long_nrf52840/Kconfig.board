@@ -1,0 +1,4 @@
+
+config BOARD_BPARASITE_LONG_NRF52840
+	bool "b-parasite nRF52840 board long version"
+	depends on SOC_NRF52840_QIAA

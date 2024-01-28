@@ -30,9 +30,18 @@ static struct adc_sequence sequence = {
     .buffer = &buf,
     .buffer_size = sizeof(buf),
 };
-
+#ifdef CONFIG_BOARD_BPARASITE_LONG_NRF52840
+static const struct adc_dt_spec adc_soil_spec1 =
+    ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 0);
+static const struct adc_dt_spec adc_soil_spec2 =
+    ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 3);
+static const struct adc_dt_spec adc_soil_spec3 =
+    ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 4);
+#else
 static const struct adc_dt_spec adc_soil_spec =
     ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 0);
+#endif
+
 
 static const struct adc_dt_spec adc_batt_spec =
     ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 1);
@@ -116,7 +125,13 @@ static int read_adc_spec(const struct adc_dt_spec* spec, prst_adc_read_t* out) {
 }
 
 int prst_adc_init() {
+  #ifdef CONFIG_BOARD_BPARASITE_LONG_NRF52840
+  RET_IF_ERR(adc_channel_setup_dt(&adc_soil_spec1))
+  RET_IF_ERR(adc_channel_setup_dt(&adc_soil_spec2))
+  RET_IF_ERR(adc_channel_setup_dt(&adc_soil_spec3))
+  #else
   RET_IF_ERR(adc_channel_setup_dt(&adc_soil_spec));
+  #endif;
   RET_IF_ERR(adc_channel_setup_dt(&adc_batt_spec));
 
   RET_IF_ERR(!device_is_ready(fast_disch_dt.port));
@@ -147,8 +162,55 @@ int prst_adc_batt_read(prst_batt_t* out) {
   return 0;
 }
 
+#ifdef CONFIG_BOARD_BPARASITE_LONG_NRF52840
+int prst_adc_soil_read(float battery_voltage, prst_adc_soil_moisture_t* out1, prst_adc_soil_moisture_t* out2, prst_adc_soil_moisture_t* out3) {
+#else
 int prst_adc_soil_read(float battery_voltage, prst_adc_soil_moisture_t* out) {
+#endif
+
+  #ifdef CONFIG_BOARD_BPARASITE_LONG_NRF52840
   // Enable fast discharge circuit.
+  RET_IF_ERR(gpio_pin_set_dt(&fast_disch_dt, 1));
+  // Start PWM.
+  RET_IF_ERR(pwm_set_dt(&soil_pwm_dt, soil_pwm_dt.period, pulse));
+  k_msleep(30);
+  RET_IF_ERR(read_adc_spec(&adc_soil_spec1, &out1->adc_read));
+  // Stop PWM.
+  RET_IF_ERR(pwm_set_dt(&soil_pwm_dt, 0, 0));
+  // Turn off fast discharge circuit.
+  RET_IF_ERR(gpio_pin_set_dt(&fast_disch_dt, 0));
+  out1->percentage =
+      MAX(0.0f, MIN(1.0f, get_soil_moisture_percent(battery_voltage, buf)));
+
+  k_msleep(30);
+  // Enable fast discharge circuit.
+  RET_IF_ERR(gpio_pin_set_dt(&fast_disch_dt, 1));
+  // Start PWM.
+  RET_IF_ERR(pwm_set_dt(&soil_pwm_dt, soil_pwm_dt.period, pulse));
+  k_msleep(30);
+  RET_IF_ERR(read_adc_spec(&adc_soil_spec2, &out2->adc_read));
+  // Stop PWM.
+  RET_IF_ERR(pwm_set_dt(&soil_pwm_dt, 0, 0));
+  // Turn off fast discharge circuit.
+  RET_IF_ERR(gpio_pin_set_dt(&fast_disch_dt, 0));
+  out2->percentage =
+      MAX(0.0f, MIN(1.0f, get_soil_moisture_percent(battery_voltage, buf)));
+
+  k_msleep(30);
+  // Enable fast discharge circuit.
+  RET_IF_ERR(gpio_pin_set_dt(&fast_disch_dt, 1));
+  // Start PWM.
+  RET_IF_ERR(pwm_set_dt(&soil_pwm_dt, soil_pwm_dt.period, pulse));
+  k_msleep(30);
+  RET_IF_ERR(read_adc_spec(&adc_soil_spec3, &out3->adc_read));
+  // Stop PWM.
+  RET_IF_ERR(pwm_set_dt(&soil_pwm_dt, 0, 0));
+  // Turn off fast discharge circuit.
+  RET_IF_ERR(gpio_pin_set_dt(&fast_disch_dt, 0));
+  out3->percentage =
+      MAX(0.0f, MIN(1.0f, get_soil_moisture_percent(battery_voltage, buf)));
+  #else
+    // Enable fast discharge circuit.
   RET_IF_ERR(gpio_pin_set_dt(&fast_disch_dt, 1));
   // Start PWM.
   RET_IF_ERR(pwm_set_dt(&soil_pwm_dt, soil_pwm_dt.period, pulse));
@@ -160,6 +222,8 @@ int prst_adc_soil_read(float battery_voltage, prst_adc_soil_moisture_t* out) {
   RET_IF_ERR(gpio_pin_set_dt(&fast_disch_dt, 0));
   out->percentage =
       MAX(0.0f, MIN(1.0f, get_soil_moisture_percent(battery_voltage, buf)));
+  #endif
+
   return 0;
 }
 

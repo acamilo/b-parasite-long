@@ -32,7 +32,11 @@ int prst_adc_init();
 
 int prst_adc_batt_read(prst_batt_t* out);
 
+#ifdef CONFIG_BOARD_BPARASITE_LONG_NRF52840
+int prst_adc_soil_read(float battery_voltage, prst_adc_soil_moisture_t* out1, prst_adc_soil_moisture_t* out2, prst_adc_soil_moisture_t* out3);
+#else
 int prst_adc_soil_read(float battery_voltage, prst_adc_soil_moisture_t* out);
+#endif
 
 int prst_adc_photo_read(float battery_voltage, prst_adc_photo_sensor_t* out);
 

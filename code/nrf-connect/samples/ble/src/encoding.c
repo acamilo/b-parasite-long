@@ -61,6 +61,7 @@ int prst_ble_encode_service_data(const prst_sensors_t* sensors,
   uint16_t soil_val = 10000 * sensors->soil.percentage;
   out[4] = soil_val & 0xff;
   out[5] = soil_val >> 8;
+  
   // 2. Temp.
   // int16_t.
   out[6] = (0b001 << 5) | 3;
@@ -122,12 +123,34 @@ int prst_ble_encode_service_data(const prst_sensors_t* sensors,
   uint16_t batt_val = sensors->batt.adc_read.millivolts;
   out[14] = batt_val & 0xff;
   out[15] = batt_val >> 8;
-  // Soil moisture.
+  #ifdef CONFIG_BOARD_BPARASITE_LONG_NRF52840
+ // Soil moisture.
+  out[16] = 0x14;
+  // Factor of 0.01, so we need to multiply our the value in 100% by 1/0.01 = 100.
+  uint16_t soil_val1 = 10000 * sensors->soil1.percentage;
+  out[17] = soil_val1 & 0xff;
+  out[18] = soil_val1 >> 8;
+    // Soil moisture.
+  out[19] = 0x14;
+  // Factor of 0.01, so we need to multiply our the value in 100% by 1/0.01 = 100.
+  uint16_t soil_val2 = 10000 * sensors->soil2.percentage;
+  out[20] = soil_val2 & 0xff;
+  out[21] = soil_val2 >> 8;
+    // Soil moisture.
+  out[22] = 0x14;
+  // Factor of 0.01, so we need to multiply our the value in 100% by 1/0.01 = 100.
+  uint16_t soil_val3 = 10000 * sensors->soil3.percentage;
+  out[23] = soil_val3 & 0xff;
+  out[14] = soil_val3 >> 8;
+  #else
+// Soil moisture.
   out[16] = 0x14;
   // Factor of 0.01, so we need to multiply our the value in 100% by 1/0.01 = 100.
   uint16_t soil_val = 10000 * sensors->soil.percentage;
   out[17] = soil_val & 0xff;
   out[18] = soil_val >> 8;
+  #endif
+ 
 
 #endif  // Encoding protocols
 

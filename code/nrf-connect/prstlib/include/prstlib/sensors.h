@@ -5,7 +5,14 @@
 #include "prstlib/shtc3.h"
 
 typedef struct {
+  
+  #ifdef CONFIG_BOARD_BPARASITE_LONG_NRF52840
+  prst_adc_soil_moisture_t soil1;
+  prst_adc_soil_moisture_t soil2;
+  prst_adc_soil_moisture_t soil3;
+  #else
   prst_adc_soil_moisture_t soil;
+  #endif
   prst_adc_photo_sensor_t photo;
   prst_batt_t batt;
   prst_shtc3_read_t shtc3;

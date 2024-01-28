@@ -34,9 +34,9 @@ static struct adc_sequence sequence = {
 static const struct adc_dt_spec adc_soil_spec1 =
     ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 0);
 static const struct adc_dt_spec adc_soil_spec2 =
-    ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 3);
+    ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 2);
 static const struct adc_dt_spec adc_soil_spec3 =
-    ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 4);
+    ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 3);
 #else
 static const struct adc_dt_spec adc_soil_spec =
     ADC_DT_SPEC_GET_BY_IDX(DT_PATH(zephyr_user), 0);
@@ -131,7 +131,7 @@ int prst_adc_init() {
   RET_IF_ERR(adc_channel_setup_dt(&adc_soil_spec3))
   #else
   RET_IF_ERR(adc_channel_setup_dt(&adc_soil_spec));
-  #endif;
+  #endif
   RET_IF_ERR(adc_channel_setup_dt(&adc_batt_spec));
 
   RET_IF_ERR(!device_is_ready(fast_disch_dt.port));

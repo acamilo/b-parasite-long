@@ -1352,6 +1352,10 @@
     (stroke (width 0) (type default))
     (uuid 12422a89-3d0c-485c-9386-f77121fd68fd)
   )
+  (wire (pts (xy 175.895 132.08) (xy 180.975 132.08))
+    (stroke (width 0) (type default))
+    (uuid 12f60645-e058-4073-8e50-238a66cab6eb)
+  )
   (wire (pts (xy 96.52 17.78) (xy 96.52 20.32))
     (stroke (width 0) (type default))
     (uuid 14b66ecf-220d-4cd1-a532-d4c06ae012f7)
@@ -3760,6 +3764,31 @@
       (project "parasite"
         (path "/922058ca-d09a-45fd-8394-05f3e2c1e03a"
           (reference "U1") (unit 3)
+        )
+      )
+    )
+  )
+
+  (symbol (lib_id "power:+3V0") (at 175.895 132.08 90) (unit 1)
+    (in_bom yes) (on_board yes) (dnp no)
+    (uuid 9ae8e7ed-16d1-4448-a69d-6c707863746a)
+    (property "Reference" "#PWR010" (at 179.705 132.08 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Value" "+3V0" (at 171.5008 131.699 0)
+      (effects (font (size 1.27 1.27)))
+    )
+    (property "Footprint" "" (at 175.895 132.08 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (property "Datasheet" "" (at 175.895 132.08 0)
+      (effects (font (size 1.27 1.27)) hide)
+    )
+    (pin "1" (uuid 4e2b47b1-b10f-440b-a600-59aa284f1295))
+    (instances
+      (project "parasite"
+        (path "/922058ca-d09a-45fd-8394-05f3e2c1e03a"
+          (reference "#PWR010") (unit 1)
         )
       )
     )

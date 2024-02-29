@@ -141,7 +141,7 @@ int prst_ble_encode_service_data(const prst_sensors_t* sensors,
   // Factor of 0.01, so we need to multiply our the value in 100% by 1/0.01 = 100.
   uint16_t soil_val3 = 10000 * sensors->soil3.percentage;
   out[23] = soil_val3 & 0xff;
-  out[14] = soil_val3 >> 8;
+  out[24] = soil_val3 >> 8;
   #else
 // Soil moisture.
   out[16] = 0x14;

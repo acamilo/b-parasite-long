@@ -100,6 +100,12 @@
 		reg = <0x70>;
 		label = "SHTC3";
 	};
+
+	tmp117: tmp117@49 {
+		compatible = "i2c-device";
+		reg = <0x49>;
+		label = "TMP117";
+	};
 };
 
 &pwm0 {

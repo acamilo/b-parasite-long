@@ -3,6 +3,7 @@
 
 #include "prstlib/adc.h"
 #include "prstlib/shtc3.h"
+#include "prstlib/tmp117.h"
 
 typedef struct {
   
@@ -16,7 +17,9 @@ typedef struct {
   prst_adc_photo_sensor_t photo;
   prst_batt_t batt;
   prst_shtc3_read_t shtc3;
+  prst_tmp117_read_t tmp117;
 } prst_sensors_t;
+
 
 int prst_sensors_read_all(prst_sensors_t *out);
 

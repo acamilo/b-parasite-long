@@ -28,5 +28,5 @@ int prst_tmp117_read(prst_tmp117_read_t *out){
 
     out->temp_c = ((float)((buff[0] << 8) | buff[1])) * PRST_TMP117_RESOLUTION;
 
-
+    return 0;
 }

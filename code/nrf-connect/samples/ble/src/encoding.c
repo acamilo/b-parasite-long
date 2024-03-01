@@ -5,6 +5,18 @@
 
 LOG_MODULE_DECLARE(ble, LOG_LEVEL_INF);
 
+int get_battery_percentage(uint_fast16_t milivolts){
+  if(milivolts>3000) return 100;
+  if(milivolts>2900) return 80;
+  if(milivolts>2800) return 60;
+  if(milivolts>2700) return 40;
+  if(milivolts>2600) return 30;
+  if(milivolts>2500) return 20;
+  if(milivolts>2400) return 10;
+  if(milivolts>2000) return 1;
+  return 0;
+}
+
 int prst_ble_encode_service_data(const prst_sensors_t* sensors,
                                  const bt_addr_le_t* bt_addr, uint8_t* out,
                                  uint8_t out_len) {
@@ -105,43 +117,46 @@ int prst_ble_encode_service_data(const prst_sensors_t* sensors,
   out[4] = temp_val & 0xff;
   out[5] = temp_val >> 8;
   // Humidity.
-  out[6] = 0x03;
+  out[6] = 0x2E;
   // Value. Factor 0.01, over 100%.
-  uint16_t humi_val = 10000 * sensors->shtc3.rel_humi;
-  out[7] = humi_val & 0xff;
-  out[8] = humi_val >> 8;
+  uint8_t humi_val = 100 * sensors->shtc3.rel_humi;
+  out[7] = humi_val;
   // Illuminance.
-  out[9] = 0x05;
+  out[8] = 0x05;
   // Value. Factor of 0.01.
   uint32_t lux_val = sensors->photo.brightness * 100;
-  out[10] = lux_val & 0xff;
-  out[11] = (lux_val >> 8) & 0xff;
-  out[12] = (lux_val >> 16) & 0xff;
+  out[9] = lux_val & 0xff;
+  out[10] = (lux_val >> 8) & 0xff;
+  out[11] = (lux_val >> 16) & 0xff;
   // Battery voltage.
-  out[13] = 0x0c;
-  // Value. Factor of 0.001.
-  uint16_t batt_val = sensors->batt.adc_read.millivolts;
-  out[14] = batt_val & 0xff;
-  out[15] = batt_val >> 8;
+  out[12] = 0x01;
+  // Value. use mapping function.
+  uint8_t batt_per =get_battery_percentage(sensors->batt.adc_read.millivolts);
+  out[13] = batt_per;
   #ifdef CONFIG_BOARD_BPARASITE_LONG_NRF52840
  // Soil moisture.
-  out[16] = 0x14;
+  out[14] = 0x2f;
   // Factor of 0.01, so we need to multiply our the value in 100% by 1/0.01 = 100.
-  uint16_t soil_val1 = 10000 * sensors->soil1.percentage;
-  out[17] = soil_val1 & 0xff;
-  out[18] = soil_val1 >> 8;
+  uint8_t soil_val1 = 100 * sensors->soil1.percentage;
+  out[15] = soil_val1;
+
     // Soil moisture.
-  out[19] = 0x14;
+  out[16] = 0x2f;
   // Factor of 0.01, so we need to multiply our the value in 100% by 1/0.01 = 100.
-  uint16_t soil_val2 = 10000 * sensors->soil2.percentage;
-  out[20] = soil_val2 & 0xff;
-  out[21] = soil_val2 >> 8;
+  uint8_t soil_val2 = 100 * sensors->soil2.percentage;
+  out[17] = soil_val2;
+
     // Soil moisture.
-  out[22] = 0x14;
+  out[18] = 0x2f;
   // Factor of 0.01, so we need to multiply our the value in 100% by 1/0.01 = 100.
-  uint16_t soil_val3 = 10000 * sensors->soil3.percentage;
-  out[23] = soil_val3 & 0xff;
-  out[24] = soil_val3 >> 8;
+  uint8_t soil_val3 = 100 * sensors->soil3.percentage;
+  out[19] = soil_val3;
+
+    // Temperature.
+  out[20] = 0x02;
+  int16_t soil_temp_val = 100 * sensors->tmp117.temp_c;
+  out[21] = soil_temp_val & 0xff;
+  out[22] = soil_temp_val >> 8;
   #else
 // Soil moisture.
   out[16] = 0x14;
